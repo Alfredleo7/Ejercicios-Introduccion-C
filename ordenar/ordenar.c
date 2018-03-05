@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define T 18
+#define T 16 
 #define MAX_PRI 256
 #define MAX_PID 1024
 
