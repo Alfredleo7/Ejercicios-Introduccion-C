@@ -37,7 +37,7 @@ int comprobarCredenciales(char *cred, struct User *db, int dbSize){
    * strstr() para buscar la cadena "@" en cred y apunta a donde esta alojado */
   char *p = strstr(cred, "@");
   if(p == NULL){ // No se ha encontrado @ en cred
-    return 0;
+    return -1;
   } else {
     *p = '\0'; // Sustituimos @ por \0
     char *usuario = cred;
@@ -47,9 +47,9 @@ int comprobarCredenciales(char *cred, struct User *db, int dbSize){
     int res1 = strcmp(db[i].usuario, usuario);
     int res2 = strcmp(db[i].password, password);
     if(res1 == 0 && res2 == 0){
-      return 1;
+      return 0;
     }
     }
   }
-  return 0;
+  return 1;
 }
