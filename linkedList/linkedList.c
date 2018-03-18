@@ -19,7 +19,7 @@ void print(node_t *head);
 int main(){
   node_t *head = NULL;
   head = malloc(sizeof(node_t));
-  if(head == NULL){ return 1; };
+  if(head == NULL){ return 1; };//Si el primero nodo esta vacio cerramos
   head -> val = 1;
   head -> next = malloc(sizeof(node_t));
   head -> next -> val = 2;
