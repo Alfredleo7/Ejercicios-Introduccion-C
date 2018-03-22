@@ -1,3 +1,7 @@
+/* Este programa codifica un archivo y lo guarda en otro nuevo con el nombre facilitado.
+ * La codificacion consiste en sumar a cada caracter del archivo el offset indicado.
+ * Si tuvieramos un archivo con una cadena tal que: "AAAA", y lo codificamos con un offset
+ * de 1, obtendriamos un nuevo archivo con la cadena "BBBB". */
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -8,17 +12,19 @@
 void codificar(char *origen, char *destino, int offset);
 void codificarBuffer(char *buffer, int offset, int leidos);
 int main (int argc, char *argv[]){
+	// 1. Comprobamos que la invocacion al programa es correcta
 	if (argc < 4){
 	printf("Error! Uso: %s <nombreorigen> <nombredestino> <offset>\n", argv[0]);
 	exit(-1);
 	}
+	// 2. Procedemos a codificar el archivo
 	codificar(argv[1], argv[2], atoi(argv[3]));
 	return 0;
 }
 
 void codificar(char *origen, char *destino, int offset){
-	// 1. Abrimos los ficheros
-	int fd_origen, fd_destino;
+	// 1. Abrimos los ficheros, comprobando en ambos que no haya error al hacer esto.
+	int fd_origen, fd_destino; // Enteros que representan al archivo (file descriptor)
 	if((fd_origen = open(origen, O_RDONLY)) < 0){
 		perror("open origen");
 		exit(-1);
@@ -29,8 +35,9 @@ void codificar(char *origen, char *destino, int offset){
 		exit(-1);
 	}
 	// 2. Procesamos los ficheros. Leo de origen, codifico, escribo en destino
-	char buffer[T];
-	int leidos, escritos;
+	char buffer[T]; // Buffer donde almacenaremos T bytes para codificarlos
+	int leidos, escritos; // Numero de bytes leidos y escritos
+	//Leemos del archivo al que corresponde fd_origen T bytes y los almacenamos en buffer
 	leidos = read(fd_origen, buffer, T);
 	while(leidos > 0){
 		// Codificamos el contenido del buffer
