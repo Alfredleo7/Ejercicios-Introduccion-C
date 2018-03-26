@@ -3,16 +3,20 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+/* Colors */
 #define KGRN "\x1B[32m"
 #define KYEL "\x1B[33m"
 #define KRED "\x1B[31m"
 #define KRESET "\x1B[0m"
+/* Funciones */
 void strrev(char *str);
 void decToBin(int dec);
 void decToOct(int dec);
 void decToHex(int dec);
 int binToDec(char *bin);
-// TODO - Añadir entrada para octal y hex, con sus respectivas funciones
+int octToDec(char *oct);
+
+
 int main(int argc, char *argv[]){
 	if(argc < 3 || *argv[1] != '-'){
 		printf("Error! Formato de entrada: %s -<notacion> <numero>\n", argv[0]);
@@ -29,9 +33,15 @@ int main(int argc, char *argv[]){
 			decToOct(binToDec(argv[2]));
 			decToHex(binToDec(argv[2]));
 			break;
+    case 'o':
+      printf(KRED "Decimal: %d\n" KRESET, octToDec(argv[2]));
+      decToBin(octToDec(argv[2]));
+      decToHex(octToDec(argv[2]));
+      break;
 	}	
 	return 0;
 }
+/* Funciones */
 void strrev(char *str){
 	char *start = str; // Apuntamos al inicio
 	char *end = str + strlen(str)-1; // Apuntamos al final
@@ -113,8 +123,15 @@ int binToDec(char *bin){
 	int dec = 0;
 	for(int i = 1; i<=strlen(bin);i++){
 		if(bin[strlen(bin)-i]=='1'){
-		dec += pow(2, i-1);
+		  dec += pow(2, i-1);
 		}
 	}
 	return dec;
+}
+int octToDec(char *oct){
+  int dec = 0;
+  for(int i=1; i<=strlen(oct);i++){
+    dec += (oct[strlen(oct)-i]-'0')*(pow(8, i-1));
+  }
+  return dec;  
 }
