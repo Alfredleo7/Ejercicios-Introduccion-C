@@ -16,7 +16,15 @@ void decToHex(int dec);
 int binToDec(char *bin);
 int octToDec(char *oct);
 
-
+/*
+ | Funcion  | Entrada   |
+ |----------+-----------|
+ | decToBin | int dec   |
+ | decToOct | int dec   |
+ | decToHex | int dec   |
+ | binTodec | char *bin |
+ | octToDec | char *oct |
+ */ 
 int main(int argc, char *argv[]){
 	if(argc < 3 || *argv[1] != '-'){
 		printf("Error! Formato de entrada: %s -<notacion> <numero>\n", argv[0]);
