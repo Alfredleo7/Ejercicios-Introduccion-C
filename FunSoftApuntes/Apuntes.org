@@ -99,14 +99,14 @@ int *p = a;
 *p = 10;
 //|     |  0 | 1 | 2 | 3 | 4 |
 //|-----+----+---+---+---+---|
-//| *a* | 10 |   |   |   |   |
+//|   a | 10 |   |   |   |   |
 
 p++;
 *p = 20;
 
 //|     |  0 |  1 | 2 | 3 | 4 |
 //|-----+----+----+---+---+---|
-//| *a* | 10 | 20 |   |   |   |
+//|   a | 10 | 20 |   |   |   |
 
 p = &a[2];
 *p = 30;
@@ -115,13 +115,13 @@ p = a + 3;
 
 //|     |  0 |  1 |  2 |  3 | 4 |
 //|-----+----+----+----+----+---|
-//| *a* | 10 | 20 | 30 | 40 |   |
+//|   a | 10 | 20 | 30 | 40 |   |
 
 p = a;
 *(p + 4) = 50;
 //|     |  0 |  1 |  2 |  3 |  4 |
 //|-----+----+----+----+----+----|
-//| *a* | 10 | 20 | 30 | 40 | 50 |
+//|   a | 10 | 20 | 30 | 40 | 50 |
 #+END_SRC
 **** Punteros a structs
 #+BEGIN_SRC C -n
@@ -184,7 +184,7 @@ int main(){
 }
 #+END_SRC
 
-****  Ejemplo por direccion
+**** Ejemplo por direccion
 #+BEGIN_SRC C -n
 void doble(int *i){ // Entra un puntero
  	*i = (*i) + (*i);
@@ -210,4 +210,18 @@ int main(){
 	printf("%d",x); // Imprime 7
 	free(x); // Liberamos memoria
 }
+#+END_SRC
+**** Array como argumento
+
+En C, el paso como argumento de un array es un puntero a la primera posicion del array.
+El identificador de un array es un puntero constante a la primera pos del mismo.
+Ejemplo:
+#+BEGIN_SRC C -n
+int a[3];
+
+void f(int *a);
+void f(int a[]);
+//Ambas maneras de declarar la funcion son correctas
+
+f(a); // Entra por valor
 #+END_SRC
