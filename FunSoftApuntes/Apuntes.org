@@ -2,8 +2,8 @@
 ** Distribucion de la memoria en C
 |------------------------------------+-----------------------------|
 | Argumentos de la linea de comandos | \leftarrow *High address*   |
-| y variables del entorno            | <                           |
-|------------------------------------+-----------------------------|
+| y variables del entorno            |                             |
+|------------------------------------|-----------------------------|
 | STACK                              | \leftarrow Memoria estatica |
 |------------------------------------+-----------------------------|
 | HEAP                               | \leftarrow Memoria dinamica |
