@@ -1,8 +1,8 @@
 * Resumen
 ** Senyales
-
+   #+BEGIN_SRC C 
    signal(int signo, manejador);
-
+   #+END_SRC
 ** Manejo del tiempo
 *** Alarm
 
@@ -10,7 +10,7 @@
     una senyal. La senyal que manda alarm es SIGALRM al terminar.
     A continuacion se muestra un pequenyo ejemplo de un temporizador
     periodico.
-
+   #+BEGIN_SRC C 
     void manejador(int signal){
         alarm(5);
 	signal(SIGALRM, manejador);
@@ -22,13 +22,14 @@
 	    pause();
 	}
     }
+    #+END_SRC
 
     Este ejemplo presenta el inconveniente de que hay un delay en el
     tiempo de ejecucion, por lo que vamos a ir acumulando error.
 *** Temporizadores
-    
+    #+BEGIN_SRC C
     int setitimer(int tipo, const struct itimerval *value, struct itimerval *anterior);
-    
+    #+END_SRC
     Devuelve:
         - -1 cuando peta.
 	- 0 cuando ejecuta OK.
@@ -44,9 +45,9 @@
 	- ITIMER_PROF: Tiempo que el proceso se esta ejecutando 
 	  (usuario + kernel). Dispara SIGPROF.
 
-	Treal > Tprof > Tvirtual 
-    
-    
+	-Treal > Tprof > Tvirtual 
+	
+	#+BEGIN_SRC C
 	struct itimerval{
 	    struct timerval it_value; // Cuando se produce el primer disparo
 	    struct timerval it_interval; // Cuando se produce el siguiente
@@ -57,6 +58,7 @@
 	    long tv_sec;  // Segundos
 	    long tv_usec; // Microsegundos - S/1,000,000
 	}
+	#+END_SRC 
 	
     El temporizador se desactiva cuando se arma con el valor 0.
     El kernel revisa eventos cada 10ms, aunque esto es ajustable.
@@ -69,6 +71,7 @@
      - tabla de punteros a funciones // Implementacion mas dificil
    
 **** Ejemplo
+     #+BEGIN_SRC C
      #define E1 0 // 1er evento
      #define E2 1 // 2do evento
      .
@@ -104,3 +107,4 @@
 		 }
      }
      
+     #+END_SRC 
