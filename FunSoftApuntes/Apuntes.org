@@ -16,29 +16,29 @@
 |                                              |                             |
 |----------------------------------------------+-----------------------------|
                                    
-** Memoria Dinamica
+** Memoria Dinamica y Estatica
 
 *** Repaso rapido de punteros:
-#+BEGIN_SRC C
+#+BEGIN_SRC C -n
 int *p; // Va al Stack
 int x = 10; // Va al Stack
 p = &x; // Va al stack. p ahora apunta a x
 *p = 20; // Va donde apunta p y asigna 20
 printf("%d", x); // Imprime 20
 #+END_SRC
-
+    
 *** Punteros
 **** Punteros en C++
-#+BEGIN_SRC C++
+#+BEGIN_SRC C++ -n
 int *p = new int; // Va al Stack. Su tamanyo se sabe al compilar
 delete p; // Borra p y libera la memoria
 const int T = 10;
 int *p = new int[T]; // Reserva espacio para 10 enteros
 delete []p; // Borra y libera lo anterior
-#+END_SRC		      .	
+#+END_SRC		      	
 **** Punteros en C	       
-***** Con malloc()  .  .. ..  
-#+BEGIN_SRC C		      
+***** - Con malloc()  
+#+BEGIN_SRC C -n		      
 int *p = (int *)malloc(sizeof(int)); // Alojamos 1 int
 /* Como malloc pide la cantidad d  memoria a reservar y esta
  * varia entre maquinas tenemos que utilizar sizeof() */
@@ -47,11 +47,11 @@ int *p = (int *)malloc(sizeof(int)); // Alojamos 1 int
 int *q = (int *)malloc(T*sizeof(int)); // Alojamos T ints
 
 #+END_SRC
-***** Con calloc()
+***** - Con calloc()
 malloc() asigna memoria sin quitar la basura. calloc() sin embargo
 se encarga de inicializar la memoria a '\0'.
 
-#+BEGIN_SRC C
+#+BEGIN_SRC C -n
 #define T 10;
 int *q = (int *)calloc(T,sizeof(int)); // Alojamos T ints
 free(q); // Libera la memoria
@@ -59,7 +59,7 @@ free(q); // Libera la memoria
 
 Un ejemplo:
 
-#+BEGIN_SRC C
+#+BEGIN_SRC C -n
 int x = 10; // Stack
 int **p; // Stack
 p = (int **)malloc(sizeof(int *)); // Heap. Nos devuelve una direccion
@@ -68,12 +68,12 @@ p = (int **)malloc(sizeof(int *)); // Heap. Nos devuelve una direccion
 /* Tenemos una zona del stack que apunta a heap que apunta a stack
  
       +----------------------+
-    x |         10           |<-----------+
+    x |         10           |<----------+
       |----------------------| 		 |
       |                      | 		 |
       |                      | 		 |
       |       STACK          | 	         |
-      +----------------------|	         |
+      |----------------------|	         |
     p |                      |------|    |
       +----------------------+      |    |
       |                      |      |    |
@@ -85,9 +85,37 @@ malloc|                      |\ <---+    |
 			        \        |
 				 --------+
 */   
-  **p = 30;
+  **p = 30; // Asignamos 30 a x
 //||
 //|+------> Va a donde apunta p->Heap
 //+--------> Va a donde apunta esa zona de Heap -> x
-                 
+   
 #+END_SRC            
+**** Punteros a structs
+#+BEGIN_SRC C -n
+struct x{
+	int dato1;
+	int dato2;
+};
+struct x *p = (struct x *)malloc(sizeof(struct x));
+(*p).dato1 = 5;
+p->dato2 = 10;
+#+END_SRC
+**** Punteros a funciones
+Son punteros a segmetos del data, que es la parte de la memoria en
+la que esta el codigo fuente.
+/ El nombre de una funcion es un puntero a la zona de memoria donde
+esta almacenada dicha funcion. /
+Ejemplo: 
+#+BEGIN_SRC C -n
+int f(int a, int b); // Suma
+int g(int a, int b; //Resta
+
+int (*punteroFuncion)(int, int);
+/* Estamos declarando un puntero a una funcion en la que entran 2
+ * int y devuelve tambien un int. */
+punteroFuncion = f;
+punteroFuncion(3, 4); // Devuelve 7, ya que apunta a f
+punteroFuncion = g;
+punteroFuncion(3, 4); // Devuelve -1, ya que apunta a g
+#+END_SRC
