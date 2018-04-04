@@ -16,4 +16,23 @@
 |                                              |                             |
 |----------------------------------------------+-----------------------------|
                                    
- 
+** Memoria Dinamica
+
+*** Repaso rapido de punteros:
+#+BEGIN_SRC C
+int *p; // Va al Stack
+int x = 10; // Va al Stack
+p = &x; // Va al stack. p ahora apunta a x
+*p = 20; // Va donde apunta p y asigna 20
+printf("%d", x); // Imprime 20
+#+END_SRC
+
+*** Punteros
+**** Punteros en C++
+#+BEGIN_SRC C++
+int *p = new int; // Va al Stack. Su tamanyo se sabe al compilar
+delete p; // Borra p y libera la memoria
+const int T = 10;
+int *p = new int[T]; // Reserva espacio para 10 enteros
+delete []p; // Borra y libera lo anterior
+#+END_SRC
