@@ -1,7 +1,8 @@
 * *Apuntes Fundamentos del Software en Linux*
 ** Distribucion de la memoria en C
 |------------------------------------+-----------------------------|
-| Argumentos de la linea de comandos y variables del entorno | \leftarrow *High address*   |
+| Argumentos de la linea de comandos | \leftarrow *High address*   |
+| y variables del entorno            | <                           |
 |------------------------------------+-----------------------------|
 | STACK                              | \leftarrow Memoria estatica |
 |------------------------------------+-----------------------------|
