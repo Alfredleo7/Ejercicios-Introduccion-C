@@ -35,4 +35,59 @@ delete p; // Borra p y libera la memoria
 const int T = 10;
 int *p = new int[T]; // Reserva espacio para 10 enteros
 delete []p; // Borra y libera lo anterior
+#+END_SRC		      .	
+**** Punteros en C	       
+***** Con malloc()  .  .. ..  
+#+BEGIN_SRC C		      
+int *p = (int *)malloc(sizeof(int)); // Alojamos 1 int
+/* Como malloc pide la cantidad d  memoria a reservar y esta
+ * varia entre maquinas tenemos que utilizar sizeof() */
+
+#define T 10;
+int *q = (int *)malloc(T*sizeof(int)); // Alojamos T ints
+
 #+END_SRC
+***** Con calloc()
+malloc() asigna memoria sin quitar la basura. calloc() sin embargo
+se encarga de inicializar la memoria a '\0'.
+
+#+BEGIN_SRC C
+#define T 10;
+int *q = (int *)calloc(T,sizeof(int)); // Alojamos T ints
+free(q); // Libera la memoria
+#+END_SRC
+
+Un ejemplo:
+
+#+BEGIN_SRC C
+int x = 10; // Stack
+int **p; // Stack
+p = (int **)malloc(sizeof(int *)); // Heap. Nos devuelve una direccion
+                                   // en la que cabe un puntero a int
+*p = &x; // Asigna la direccion de x a la zona donde apunta p
+/* Tenemos una zona del stack que apunta a heap que apunta a stack
+ 
+      +----------------------+
+    x |         10           |<-----------+
+      |----------------------| 		 |
+      |                      | 		 |
+      |                      | 		 |
+      |       STACK          | 	         |
+      +----------------------|	         |
+    p |                      |------|    |
+      +----------------------+      |    |
+      |                      |      |    |
+      |       HEAP           |      |    |
+      |                      |      |    |
+      |----------------------|      |    |
+malloc|                      |\ <---+    |
+      +----------------------+ \         |
+			        \        |
+				 --------+
+*/   
+  **p = 30;
+//||
+//|+------> Va a donde apunta p->Heap
+//+--------> Va a donde apunta esa zona de Heap -> x
+                 
+#+END_SRC            
