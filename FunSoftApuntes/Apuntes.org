@@ -91,6 +91,38 @@ malloc|                      |\ <---+    |
 //+--------> Va a donde apunta esa zona de Heap -> x
    
 #+END_SRC            
+***** Ejemplo de aritmetica con punteros
+Ejemplo realizado en clase:
+#+BEGIN_SRC C
+int a[5];
+int *p = a;
+*p = 10;
+//|     |  0 | 1 | 2 | 3 | 4 |
+//|-----+----+---+---+---+---|
+//| *a* | 10 |   |   |   |   |
+
+p++;
+*p = 20;
+
+//|     |  0 |  1 | 2 | 3 | 4 |
+//|-----+----+----+---+---+---|
+//| *a* | 10 | 20 |   |   |   |
+
+p = &a[2];
+*p = 30;
+p = a + 3;
+*p = 40 
+
+//|     |  0 |  1 |  2 |  3 | 4 |
+//|-----+----+----+----+----+---|
+//| *a* | 10 | 20 | 30 | 40 |   |
+
+p = a;
+*(p + 4) = 50;
+//|     |  0 |  1 |  2 |  3 |  4 |
+//|-----+----+----+----+----+----|
+//| *a* | 10 | 20 | 30 | 40 | 50 |
+#+END_SRC
 **** Punteros a structs
 #+BEGIN_SRC C -n
 struct x{
@@ -139,8 +171,8 @@ int main() {
 }
 #+END_SRC
 **** Ejemplo por referencia
-*Solo en C++*
-#+BEGIN_SRC -n
+_*Solo en C++*_
+#+BEGIN_SRC C -n
 void doble(int &i){
 	i = i + i;
 }
@@ -149,5 +181,33 @@ int main(){
 	int x = 5;
 	doble(x);
 	printf("%d", x); // Imprime 5
+}
+#+END_SRC
+
+****  Ejemplo por direccion
+#+BEGIN_SRC C -n
+void doble(int *i){ // Entra un puntero
+ 	*i = (*i) + (*i);
+} 
+int main(){
+	int x = 5;
+	doble(&x);
+	printf("%d", x); // Imprime 10
+}
+#+END_SRC
+
+Otro ejemplo:
+
+#+BEGIN_SRC C -n
+void asignar(**i){
+	*i = (int **)malloc(sizeof(int x)); // Asigna memoria en Heap
+	**i = 7;
+}
+
+int main(){
+	int *x;
+	doble(&x);
+	printf("%d",x); // Imprime 7
+	free(x); // Liberamos memoria
 }
 #+END_SRC
