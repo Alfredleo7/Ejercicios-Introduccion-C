@@ -18,7 +18,7 @@
                                    
 ** Memoria Dinamica y Estatica
 
-*** Repaso rapido de punteros:
+*** Repaso rapido de punteros
 #+BEGIN_SRC C -n
 int *p; // Va al Stack
 int x = 10; // Va al Stack
@@ -104,8 +104,8 @@ p->dato2 = 10;
 **** Punteros a funciones
 Son punteros a segmetos del data, que es la parte de la memoria en
 la que esta el codigo fuente.
-/ El nombre de una funcion es un puntero a la zona de memoria donde
-esta almacenada dicha funcion. /
+/El nombre de una funcion es un puntero a la zona de memoria donde
+esta almacenada dicha funcion./
 Ejemplo: 
 #+BEGIN_SRC C -n
 int f(int a, int b); // Suma
@@ -118,4 +118,36 @@ punteroFuncion = f;
 punteroFuncion(3, 4); // Devuelve 7, ya que apunta a f
 punteroFuncion = g;
 punteroFuncion(3, 4); // Devuelve -1, ya que apunta a g
+#+END_SRC
+*** Pasar argumentos a funciones
+| Tipo           | C  | C++ | Descripcion                       |
+|----------------+----+-----+-----------------------------------|
+| Por valor      | Si | Si  | Copia la variable y pasa la copia |
+| Por referencia | No | Si  | Pasa la variable                  |
+| Por direccion  | Si | Si  | Pasa un puntero a la variable     |
+|----------------+----+-----+-----------------------------------|
+
+**** Ejemplo por valor
+#+BEGIN_SRC C -n
+void doble(int i){
+	i = i + i;
+}
+int main() {
+	int x = 5;
+	doble(x); // Manda una copia de x a doble
+	printf("%d", x); // Imprime 5
+}
+#+END_SRC
+**** Ejemplo por referencia
+*Solo en C++*
+#+BEGIN_SRC -n
+void doble(int &i){
+	i = i + i;
+}
+
+int main(){
+	int x = 5;
+	doble(x);
+	printf("%d", x); // Imprime 5
+}
 #+END_SRC
