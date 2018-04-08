@@ -1,3 +1,4 @@
+#+STARTUP: content indent
 #+OPTIONS: \n:t
 * *Apuntes Fundamentos del Software en Linux*
 ** Distribucion de la memoria en C
@@ -171,7 +172,7 @@ int main() {
 }
 #+END_SRC
 **** Ejemplo por referencia
-_*Solo en C++*_
+Solo en C++
 #+BEGIN_SRC C -n
 void doble(int &i){
 	i = i + i;
