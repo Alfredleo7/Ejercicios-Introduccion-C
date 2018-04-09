@@ -256,9 +256,9 @@ un pequenyo ejemplo de un temporizador periodico. Este temporizador producira
 una senyal SIGALRM cada 5s.
 #+BEGIN_SRC C
   void manejador(int signal){
-        alarm(5);
-	      signal(SIGALRM, manejador);
-    }
+    alarm(5);
+	  signal(SIGALRM, manejador);
+  }
   int main(){
         signal(SIGALRM, manejador);
         alarm(5);
@@ -282,22 +282,22 @@ int setitimer(int tipo, const strcut itimerval *value, struct itimerval *anterio
 | ITIMER_VIRTUAL | SIGVTALRM | Solamente el tiempo durante el cual el proceso se ejecuta                 |
 | ITIMER_PROF    | SIGPROF   | El tiempo de ejecucion del proceso y *tambien de sus llamadas al sistema* |
 
-Podemos afirmar que: Treal > Tprof > Tvirtual
+Podemos afirmar que: Treal > Tprof > Tvirtual. 
 Que puede devolver?
 - -1 cuando peta
 - 0 cuando ejecuta correctamente
 
 Como es su estructura? 
-	#+BEGIN_SRC C
-	struct itimerval{
-	    struct timerval it_value; // Cuando se produce el primer disparo
-	    struct timerval it_interval; // Cuando se produce el siguiente
-	}
+#+BEGIN_SRC C
+struct itimerval{
+	  struct timerval it_value; // Cuando se produce el primer disparo
+	  struct timerval it_interval; // Cuando se produce el siguiente
+}
 
 	
-	struct timeval{
-	    long tv_sec;  // Segundos
-	    long tv_usec; // Microsegundos - S/1,000,000
-	}
-	#+END_SRC 
+struct timeval{
+	  long tv_sec;  // Segundos
+	  long tv_usec; // Microsegundos - S/1,000,000
+}
+#+END_SRC 
 
