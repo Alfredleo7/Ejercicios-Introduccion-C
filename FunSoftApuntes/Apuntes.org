@@ -1,5 +1,4 @@
 #+STARTUP: content indent
-#+OPTIONS: \n:t
 * *Apuntes Fundamentos del Software en Linux*
 ** Distribucion de la memoria en C
 |----------------------------------------------+-----------------------------|
@@ -18,15 +17,6 @@
 |----------------------------------------------+-----------------------------|
                                    
 ** Memoria Dinamica y Estatica
-
-*** Repaso rapido de punteros
-#+BEGIN_SRC C -n
-int *p; // Va al Stack
-int x = 10; // Va al Stack
-p = &x; // Va al stack. p ahora apunta a x
-*p = 20; // Va donde apunta p y asigna 20
-printf("%d", x); // Imprime 20
-#+END_SRC
     
 *** Punteros
 **** Punteros en C++
@@ -152,6 +142,14 @@ punteroFuncion(3, 4); // Devuelve 7, ya que apunta a f
 punteroFuncion = g;
 punteroFuncion(3, 4); // Devuelve -1, ya que apunta a g
 #+END_SRC
+*** Repaso rapido de punteros
+#+BEGIN_SRC C -n
+int *p; // Va al Stack
+int x = 10; // Va al Stack
+p = &x; // Va al stack. p ahora apunta a x
+*p = 20; // Va donde apunta p y asigna 20
+printf("%d", x); // Imprime 20
+#+END_SRC
 *** Pasar argumentos a funciones
 | Tipo           | C  | C++ | Descripcion                       |
 |----------------+----+-----+-----------------------------------|
@@ -226,3 +224,80 @@ void f(int a[]);
 
 f(a); // Entra por valor
 #+END_SRC
+** Procesos
+*** Senyales
+Son codigos que se mandan a otros procesos para indicar condiciones varias, como 
+puede ser cerrar el programa, realizar una accion, alarmas...
+Al llegar una senyal a nuestro proceso, el manejador asociado a dicha senyal
+se ejecuta. Si no volvemos a asignar ningun manejador a esta senyal, la siguiente
+vez que llegue no pasara nada. Para la lista completa consultar el manual.
+Se declaran de la siguiente manera:
+#+BEGIN_SRC C 
+signal(int signo, manejador);
+#+END_SRC
+Un ejemplo de su uso seria:
+#+BEGIN_SRC C 
+// Declaramos el manejador de la senyal
+void manejador(int signo){
+    printf("Ha llegado la senyal\n");
+    signal(SIGUSR1, manejador); // Volvemos a asignarle el manejador a la senyal
+}
+int main(){
+    signal(SIGUSR1, manejador); // Asignamos el manejador a la senyal
+    pause(); // Esperamos a que llegue una senyal (cualquiera)
+}
+#+END_SRC
+
+** Manejo del tiempo
+*** Alarm
+Programa un temporizador. Si anyadimos un pause() esperara una senyal.
+La senyal que manda alarm al terminar es SIGALRM. A continuacion se muestra
+un pequenyo ejemplo de un temporizador periodico. Este temporizador producira
+una senyal SIGALRM cada 5s.
+#+BEGIN_SRC C
+  void manejador(int signal){
+        alarm(5);
+	      signal(SIGALRM, manejador);
+    }
+  int main(){
+        signal(SIGALRM, manejador);
+        alarm(5);
+	      while(1){
+	          pause();
+	      }
+  }    
+#+END_SRC
+El inconveniente que presenta esta manera es que hay un delay considerable debido
+al tiempo de ejecucion, por lo que se va acumulando inexactitud.
+
+*** Temporizadores
+A continuacion veremos los temporizadores y los distintos valores de tiempo que pueden
+dar.
+#+BEGIN_SRC C
+int setitimer(int tipo, const strcut itimerval *value, struct itimerval *anterior);
+#+END_SRC
+| Tipo           | Senyal    | Tiempo que cuenta                                                         |
+|----------------+-----------+---------------------------------------------------------------------------|
+| ITIMER_REAL    | SIGALRM   | Todo el tiempo que transcurre                                             |
+| ITIMER_VIRTUAL | SIGVTALRM | Solamente el tiempo durante el cual el proceso se ejecuta                 |
+| ITIMER_PROF    | SIGPROF   | El tiempo de ejecucion del proceso y *tambien de sus llamadas al sistema* |
+
+Podemos afirmar que: Treal > Tprof > Tvirtual
+Que puede devolver?
+- -1 cuando peta
+- 0 cuando ejecuta correctamente
+
+Como es su estructura? 
+	#+BEGIN_SRC C
+	struct itimerval{
+	    struct timerval it_value; // Cuando se produce el primer disparo
+	    struct timerval it_interval; // Cuando se produce el siguiente
+	}
+
+	
+	struct timeval{
+	    long tv_sec;  // Segundos
+	    long tv_usec; // Microsegundos - S/1,000,000
+	}
+	#+END_SRC 
+
