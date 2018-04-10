@@ -4,7 +4,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-
+#include <string.h>
+#define T 256
+char msg[T];
 // Definicion de estados y eventos
 
 #define IDLE 0
@@ -22,8 +24,6 @@ int espera_evento();
 void temperaturaElevada(int signo);
 void temperaturaExtrema(int signo);
 void timeout(int signo);
-void imprimeEstado(int estado, int evento);
-
 int main(int argc, char *argv[]){
     printf("%d es el pid\n", getpid());
     // Variables
@@ -56,7 +56,6 @@ int main(int argc, char *argv[]){
     estado = IDLE;
     while(1){
 	evento = espera_evento();
-	imprimeEstado(estado, evento);
 /*_____ _____  _      ______ 
  |_   _|  __ \| |    |  ____|
    | | | |  | | |    | |__   
@@ -66,10 +65,15 @@ int main(int argc, char *argv[]){
 */
       switch(estado){
       case IDLE:
+	  strcpy(msg, "Sistema de refrigeracion apagado (IDLE)\n");
+	  write(1, msg, strlen(msg));
 	  switch(evento){
 	  case TEM_ALTA:
 	      estado = NORMAL;
-	      // Set timer
+	      // Set time
+	      strcpy(msg, "Temporizador restablecido\n");
+	      write(1,msg, strlen(msg));
+	      eventoRecibido = TEM_ALTA;
 	      if((setitimer(ITIMER_REAL, &t_normal, NULL))< 0){
 		  perror("setitimer");
 		  exit(1);
@@ -92,9 +96,13 @@ int main(int argc, char *argv[]){
  |_| \_|\____/|_|  \_\_|  |_/_/    \_\______|
 */
       case NORMAL:
+	  strcpy(msg, "Sistema de refrigeracion en modo normal\n");
+	  write(1, msg, strlen(msg));
 	  switch(evento){
 	  case TEM_ALTA:
 	      // Set timer
+	      strcpy(msg, "Temporizador restablecido\n");
+	      write(1,msg, strlen(msg));
 	      if((setitimer(ITIMER_REAL, &t_normal, NULL))< 0){
 		  perror("setitimer");
 		  exit(1);
@@ -103,6 +111,8 @@ int main(int argc, char *argv[]){
 	  case TEMP_EXTREMA:
 	      estado = FULL;
 	      // Set timer con el timepo t_full
+	      strcpy(msg, "Temporizador restablecido\n");
+	      write(1,msg, strlen(msg));
 	      if((setitimer(ITIMER_REAL, &t_full, NULL))< 0){
 		  perror("setitimer");
 		  exit(1);
@@ -128,9 +138,14 @@ int main(int argc, char *argv[]){
  |_|     \____/|______|______|
 */
       case FULL:
+	  strcpy(msg, "Sistema de refrigeracion encendido a potencia maxima\n");
+	  write(1, msg, strlen(msg));
 	  switch(evento){
 	  case TEM_ALTA:
 	      estado = FULL;
+	      strcpy(msg, "Temporizador restablecido\n");
+	      write(1,msg, strlen(msg));
+
 	      if((setitimer(ITIMER_REAL, &t_full, NULL)) < 0){
 		  perror("setitimer");
 		  exit(1);
@@ -138,9 +153,12 @@ int main(int argc, char *argv[]){
 	      break;
 	  case TEMP_EXTREMA:
 	      estado = FULL;
+	      strcpy(msg, "Temporizador restablecido\n");
+	      write(1,msg, strlen(msg));
 	      if((setitimer(ITIMER_REAL, &t_full, NULL)) < 0){
-		  perror("setitimer");
-		  exit(1);
+		      eventoRecibido = TEM_ALTA;
+		      perror("setitimer");
+		      exit(1);
 	      }
 	      break;
 	  case TIMEOUT:
@@ -163,14 +181,20 @@ int main(int argc, char *argv[]){
 }
 
 void temperaturaElevada(int signo){
+    strcpy(msg, "#Llega SIGUSR1\nNivel de alerta 1\n");
     eventoRecibido = TEM_ALTA;
     signal(SIGUSR1, temperaturaElevada);
+    write(1,msg, strlen(msg));
 }
 void temperaturaExtrema(int signo){
+    strcpy(msg, "#Llega SIGUSR2\nNivel de alerta 2\n");
     eventoRecibido = TEMP_EXTREMA;
     signal(SIGUSR2, temperaturaExtrema);
+    write(1,msg, strlen(msg));
 }
 void timeout(int signo){
+    strcpy(msg, "Temporizador expirado\n");
+    write(1,msg, strlen(msg));
     signal(SIGALRM, timeout);
     eventoRecibido = TIMEOUT;
 }
@@ -179,6 +203,3 @@ int espera_evento(){
     return eventoRecibido;
 }
 
-void imprimeEstado(int estado, int evento){
-    printf("Estado %d Evento %d \n", estado, evento);
-}
