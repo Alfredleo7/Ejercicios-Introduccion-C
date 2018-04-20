@@ -40,6 +40,7 @@ int main(int argc, char *argv[]){
     if(pidA == 0){
 	// Codigo del hijoA - Envia SIGUSR1 cada 2s e imprime
 	struct itimerval t_normal;
+
 	struct timeval timer, interval;
 	
 	timer.tv_sec = 2;

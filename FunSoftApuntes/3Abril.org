@@ -3,15 +3,15 @@
    #+BEGIN_SRC C 
    signal(int signo, manejador);
    #+END_SRC
-** Manejo del tiempo
-*** Alarm
+*** Manejo del tiempo
+**** Alarm
 
     Programa un temporizador. Si anyadimos un pause() esperara
     una senyal. La senyal que manda alarm es SIGALRM al terminar.
     A continuacion se muestra un pequenyo ejemplo de un temporizador
     periodico.
    #+BEGIN_SRC C 
-    void manejador(int signal){
+   void manejador(int signal){
         alarm(5);
 	signal(SIGALRM, manejador);
     }
@@ -22,11 +22,10 @@
 	    pause();
 	}
     }
-    #+END_SRC
-
+     #+END_SRC
     Este ejemplo presenta el inconveniente de que hay un delay en el
     tiempo de ejecucion, por lo que vamos a ir acumulando error.
-*** Temporizadores
+**** Temporizadores
     #+BEGIN_SRC C
     int setitimer(int tipo, const struct itimerval *value, struct itimerval *anterior);
     #+END_SRC
@@ -41,11 +40,12 @@
 	- ITIMER_VIRTUAL: Tiempo que esta el proceso en ejecucion,
 	  solo con codigo del usuario. Es decir, el tiempo que tarda
 	  en hacer llamadas al sistema no cuenta. Dispara SIGVALARM.
+
 	  
 	- ITIMER_PROF: Tiempo que el proceso se esta ejecutando 
 	  (usuario + kernel). Dispara SIGPROF.
 
-	-Treal > Tprof > Tvirtual 
+	- Treal > Tprof > Tvirtual 
 	
 	#+BEGIN_SRC C
 	struct itimerval{
@@ -63,14 +63,14 @@
     El temporizador se desactiva cuando se arma con el valor 0.
     El kernel revisa eventos cada 10ms, aunque esto es ajustable.
 
-** Maquinas de estado
+*** Maquinas de estado
    
    Se usan para gestionar los estados de los protocolos.
    - Existen 2 implementaciones tipicas:
      - switch / case anidados // La que usaremos normalmente
      - tabla de punteros a funciones // Implementacion mas dificil
    
-**** Ejemplo
+***** Ejemplo
      #+BEGIN_SRC C
      #define E1 0 // 1er evento
      #define E2 1 // 2do evento
