@@ -1,0 +1,29 @@
+* PIPES
+** Comunicacion Full Duplex
+Pipes:
+| a | padre -> hijo |
+| b | hijo -> padre |
+Lectura y escritura de ambas:
+| Proceso | Lee  | Escribe |
+|---------+------+---------|
+| Padre   | b[0] | a[1]    |
+| Hijo    | a[0] | b[1]    |
+ 
+Al hacer fork(), ambas pipes estan abiertas por ambos extremos en los dos procesos,
+por lo que tendremos que cerrar los extremos que no usaremos en cada extremo.
+#+BEGIN_SRC C
+24Abril.c
+#+END_SRC
+* FIFO
+Las FIFO son tuberias con nombres. Existen en el sistema de ficheros, por lo que no
+nos hace falta parentesco entre procesos para poder comunicarse a traves de ellas.
+** Creacion de FIFOs
+Para crear una FIFO podemos hacer la llamada al sistema mknod() desde nuestro codigo
+fuente. Sin embargo en el desarrollo de la asignatura haremos las FIFOs desde el terminal
+usando mknod <path> P ó mkfifo <path>. //
+** Apertura de FIFOS
+- *open()* con dos extremos:
+  - O_RDONLY en el extremo que lee
+  - O_WRONLY en el extremo que escribe
+open() bloquea el proceso hasta que no se abren ambos extremos del FIFO. Esto ademas nos
+sirve como punto de sincronizacion entre procesos.
