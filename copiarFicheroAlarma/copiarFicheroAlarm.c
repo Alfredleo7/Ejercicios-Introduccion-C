@@ -23,6 +23,7 @@ void manejador_sigusr1(int signo);
 
 int main(int argc, char *argv[]){
     // 1. Procesar argumentos
+    printf("Mi PID es: %d\n", getpid());
     if (argc < 3){
         printf("Error! Uso: %s <nombredeorigen> <nombrededestino>\n", argv[0]);
         exit(-1);
