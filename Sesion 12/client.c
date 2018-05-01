@@ -26,8 +26,8 @@ int main(int argc, char *argv[]){
     perror("read");
     return -1;
   }
+  buffer[leidos - 1] = '\0'; // Sustituimos el '\n'
   int longitud = strlen(buffer); // Medimos la longitud del mensaje
-  buffer[longitud - 1] = '\0'; // Sustituimos el '\n'
 
   // Escribimos por primera vez
 
@@ -41,18 +41,15 @@ int main(int argc, char *argv[]){
   }
   // Lectura y escritura iterada
   while(strcmp(buffer, "fin\n") != 0){
-    buffer[0]='\0';
     if((leidos = read(0, buffer, T)) < 0){ // Lectura del mensaje
       perror("read");
       return -1;
     }
-    printf("He leido: %s\n", buffer);
-    if(strcmp(buffer, "fin\n") == 0){
-      return 0;
-    }
+    buffer[leidos - 1] = '\0'; // Sustituimos el '\n'
     longitud = strlen(buffer); // Medimos la longitud del mensaje
-    buffer[longitud - 1] = '\0'; // Sustituimos el '\n'
-    
+    if(strcmp(buffer, "fin") == 0){
+      break;
+    }
     if((write(fifo, &longitud, sizeof(longitud)) != sizeof(longitud))){
       perror("write longiutd");
       return -1;
@@ -61,6 +58,9 @@ int main(int argc, char *argv[]){
       perror("write mensaje");
       return -1;
     }
+  }
+  if(close(fifo) < 0){
+    perror("close fifo");
   }
   return 0;
 }

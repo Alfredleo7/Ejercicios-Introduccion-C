@@ -12,7 +12,6 @@ int main(int argc, char *argv[]){
     // Procesar argumentos(nombres de las FIFOs) con las que nos conectamos a
     // los clientes.
     if(argc < 3){
-      printf("Uso.... \n");
       return -1;
     }
     // Apertura de FIFOs y ficheros
@@ -26,7 +25,7 @@ int main(int argc, char *argv[]){
       perror("open");
       return -1;
     }
-    if((fd = open("logs.txt", O_WRONLY | O_CREAT)) < 0){
+    if((fd = open("logs.txt", O_WRONLY | O_CREAT | O_APPEND, 0644)) < 0){
       perror("open");
       return -1;
     }
@@ -74,7 +73,6 @@ void procesarFifo(int fifo, int fd, int *conectados, char *prefijo){
   } else {
     // Estoy seguro de haber leido la longitud de la cadena
     leidos = read(fifo, buffer, longitud);
-    printf("Cadena: %s Longitud: %d\n", buffer, longitud);
     if(leidos < 0){
       perror("read");
       exit(-1);
@@ -85,6 +83,7 @@ void procesarFifo(int fifo, int fd, int *conectados, char *prefijo){
       (*conectados)--;
     } else {
 	    // He recibido bien la cadena, por lo que escribo
+      buffer[longitud] = '\0';
 	    int l = strlen(prefijo);
       if(write(fd, prefijo, l) != l){
         perror("write");
