@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
       // Leer fifo1 y escribir en fichero con el prefijo
       procesarFifo(fifo1, fd, &conectados, "Cliente 1: ");
       // Leer fifo2 y escribir en fichero con el prefijo
-      procesarFifo(fifo1, fd, &conectados, "Cliente 2: ");
+      procesarFifo(fifo2, fd, &conectados, "Cliente 2: ");
     }
     
     // Cerramos FIFOs y fichero
@@ -74,6 +74,7 @@ void procesarFifo(int fifo, int fd, int *conectados, char *prefijo){
   } else {
     // Estoy seguro de haber leido la longitud de la cadena
     leidos = read(fifo, buffer, longitud);
+    printf("Cadena: %s Longitud: %d\n", buffer, longitud);
     if(leidos < 0){
       perror("read");
       exit(-1);
