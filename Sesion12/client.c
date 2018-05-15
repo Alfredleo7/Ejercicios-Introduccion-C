@@ -4,17 +4,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
-#include <stdlib.h>
 #define T 512
 
 int main(int argc, char *argv[]){
   // Procesamos los argumentos
-  if(argc < 3){
+  if(argc < 2){
     return -1;
   }
-  // Mandamos SIGUSR1 al servidor
-  kill(atoi(argv[2]), SIGUSR1);
   // Abrimos la FIFO
   int fifo;
   if((fifo = open(argv[1], O_WRONLY)) < 0){
@@ -25,7 +21,7 @@ int main(int argc, char *argv[]){
 
   int leidos;
   char buffer[T];
-
+  
   if((leidos = read(0, buffer, T)) < 0){ // Lectura del mensaje
     perror("read");
     return -1;
@@ -68,4 +64,3 @@ int main(int argc, char *argv[]){
   }
   return 0;
 }
-
