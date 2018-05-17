@@ -1,5 +1,0 @@
-* Cosas que tengo que hacer [0/4]
-  - [ ] Aprender a usar colores
-  - [ ] Aprender a crear "animaciones" simples 
-  - [ ] Aprender a crear un instalador
-  - [ ] Terminar el problema 8 de Project Euler (problemas de overflow)
