@@ -14,7 +14,10 @@
 
 ssize_t read_n(int fd, void * mensaje, size_t longitud_mensaje);
 ssize_t write_n(int fd, void * mensaje, size_t longitud_mensaje);
-
+void espera_hijos(int signo){
+  wait(0);
+  signal(SIGCHLD, espera_hijos);
+}
 /**
  * Servidor TCP que atiende peticiones ECHO de clientes, uno a uno, es decir,
  * recibe cadenas de texto que son enviadas de vuelta al cliente. El intercambio
@@ -23,6 +26,8 @@ ssize_t write_n(int fd, void * mensaje, size_t longitud_mensaje);
  * y después atiende a otro cliente.
  */
 int main(int argc, char * argv[]) {
+	//0.- Declaro el manejador para esperar a los hijos
+	signal(SIGCHLD, espera_hijos);
 	//1.- Declaramos variables
 	//2.- Creamos la dirección del servidor
 	//3.- Creamos el socket
@@ -76,95 +81,114 @@ int main(int argc, char * argv[]) {
 	while(1) {
 		printf("Servidor esperando conexión...\n");
 		//6.1.- Aceptamos una conexión: accept()
-		if ((n_sd = accept(sd, (struct sockaddr *) &cli_addr, &addr_len)) < 0) {
+		/*if ((n_sd = accept(sd, (struct sockaddr *) &cli_addr, &addr_len)) < 0) {
 			perror("accept");
 			close(n_sd);
 			close(sd);
-			exit(1);
-		}
-
-		//Aquí toca pensar...
-    //Leemos longitud + cadena
-    //Lectura adelantada de la longitud, y si leo algo, sigo leyendo la cadena
-    //Una vez recibida la cadena completa, la enviamos de la misma
-    //forma: longitud+cadena
-    int leidos;
-    uint32_t longBigEndian;
-    leidos = read_n(n_sd, &longBigEndian, sizeof(longBigEndian));
-    while(leidos > 0){
-      // Aseguro que leo todo
-      if(leidos != sizeof(longBigEndian)){
+			exit(-1);
+      }*/
+    n_sd = accept(sd, (struct sockaddr *) &cli_addr, &addr_len);
+    while(n_sd < 0){
+      if(errno != EINTR){
+        perror("accept");
+        close(sd);
+        close(n_sd);
+        exit(-1);
+      }
+      n_sd = n_sd = accept(sd, (struct sockaddr *) &cli_addr, &addr_len
+    }
+    pid_t pid;
+    if ((pid = fork()) < 0){
+      perror("fork");
+      close(n_sd);
+      close(sd);
+      exit(-1);
+    }
+    if(pid == 0){
+      //Leemos longitud + cadena
+      //Lectura adelantada de la longitud, y si leo algo, sigo leyendo la cadena
+      //Una vez recibida la cadena completa, la enviamos de la misma
+      //forma: longitud+cadena
+      int leidos;
+      uint32_t longBigEndian;
+      leidos = read_n(n_sd, &longBigEndian, sizeof(longBigEndian));
+      while(leidos > 0){
+        // Aseguro que leo todo
+        if(leidos != sizeof(longBigEndian)){
+          perror("read_n longBigEndian");
+          close(sd);
+          close(n_sd);
+          exit(-1);
+        }
+        // Ya se que el cliente esta vivo
+        // y he recibido el numero de bytes esperado
+        longitud = ntohl(longBigEndian);
+        // Leemos la cadena
+        if(read_n(n_sd, buffer, longitud) != longitud){
+          perror("read_n");
+          close(sd);
+          close(n_sd);
+          exit(-1);
+        }
+        // Imprimo lo que recibo
+        printf("buffer = %s\n", buffer);
+        // Respondo al cliente ECHO con la misma
+        // cadena y siguiendo el mismo formato: longitud + cadena
+        // Convertimos a formato de red
+        longBigEndian = htonl(longitud);
+        // Envio longitud
+        if(write_n(n_sd, &longBigEndian, sizeof(longBigEndian)) != sizeof(longBigEndian)){
+          perror("write_n longBigEndian");
+          close(sd);
+          close(n_sd);
+          exit(-1);
+        }
+        // Envio la cadena
+        if(write_n(n_sd, buffer, longitud) != longitud){
+          perror("write_n longBigEndian");
+          close(sd);
+          close(n_sd);
+          exit(-1);
+        }
+        // Vuelvo a leer
+        leidos = read_n(n_sd, &longBigEndian, sizeof(longBigEndian));
+      }
+      if(leidos < 0){
         perror("read_n longBigEndian");
         close(sd);
         close(n_sd);
         exit(-1);
-      }
-      // Ya se que el cliente esta vivo
-      // y he recibido el numero de bytes esperado
-      longitud = ntohl(longBigEndian);
-      // Leemos la cadena
-      if(read_n(n_sd, buffer, longitud) != longitud){
-        perror("read_n");
-        close(sd);
-        close(n_sd);
-        exit(-1);
-      }
-      // Imprimo lo que recibo
-      printf("buffer = %s\n", buffer);
-      // Respondo al cliente ECHO con la misma
-      // cadena y siguiendo el mismo formato: longitud + cadena
-      // Convertimos a formato de red
-      longBigEndian = htonl(longitud);
-      // Envio longitud
-      if(write_n(n_sd, &longBigEndian, sizeof(longBigEndian)) != sizeof(longBigEndian)){
-        perror("write_n longBigEndian");
-        close(sd);
-        close(n_sd);
-        exit(-1);
-      }
-      // Envio la cadena
-      if(write_n(n_sd, buffer, longitud) != longitud){
-        perror("write_n longBigEndian");
-        close(sd);
-        close(n_sd);
-        exit(-1);
-      }
-      // Vuelvo a leer
-      leidos = read_n(n_sd, &longBigEndian, sizeof(longBigEndian));
-    }
-    if(leidos < 0){
-      perror("read_n longBigEndian");
-      close(sd);
-      close(n_sd);
-      exit(-1);
-    } else {
-      // leidos = 0
-      if(close(n_sd) < 0){
+      } else {
+        // leidos = 0
+        if(close(n_sd) < 0){
         perror("close");
         exit(-1);
+        }
       }
+    } else {
+      // Codigo del padre
+      
     }
-	}
-	
+  }
 	//7.- Close
 	if (close(n_sd) < 0) {
 		perror("close");
 		exit(1);
 	}
-	
+  
 	if (close(sd) < 0) {
 		perror("close");
 		exit(1);
 	}
-		
 	
+  
 	return 0;
 }
 
 /**
  * Funciones auxiliares
  */
-ssize_t read_n(int fd, char * mensaje, size_t longitud_mensaje) {
+ssize_t read_n(int fd, void * mensaje, size_t longitud_mensaje) {
   ssize_t a_leer = longitud_mensaje;
   ssize_t total_leido = 0;
   ssize_t leido;
@@ -177,8 +201,8 @@ ssize_t read_n(int fd, char * mensaje, size_t longitud_mensaje) {
       a_leer -= leido;
     }
   } while((
-      (leido > 0) && (total_leido < longitud_mensaje)) ||
-      (errno == EINTR));
+           (leido > 0) && (total_leido < longitud_mensaje)) ||
+          (errno == EINTR));
   
   if (total_leido > 0) {
     return total_leido;
@@ -188,7 +212,7 @@ ssize_t read_n(int fd, char * mensaje, size_t longitud_mensaje) {
   }
 }
 
-ssize_t write_n(int fd, char * mensaje, size_t longitud_mensaje) {
+ssize_t write_n(int fd, void * mensaje, size_t longitud_mensaje) {
   ssize_t a_escribir = longitud_mensaje;
   ssize_t total_escrito = 0;
   ssize_t escrito;
