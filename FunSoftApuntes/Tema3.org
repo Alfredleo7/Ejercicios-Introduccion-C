@@ -100,6 +100,7 @@
        (siempre los mismos mientras dure la conexion entre ellos).
        - Un socket *TCP* es similar a realizar una *llamada telefonica*.
 *** Direcciones:
+
     Las aplicaciones que utilizan sockets necesitan poder especificar que IP y que puertos
     van a utilizar para comunicarse. Para esto tenemos el struct generico *sockaddr*.
     #+BEGIN_SRC C
@@ -157,6 +158,61 @@
     - Aunque esto no es aplicable a las cadenas de caracteres, ya que cada char ocupa 1 byte.
   - En la direccion se puede especificar una IP, un puerto, ambos o ninguno.
     - Por ejemplo, si queremos solo el puerto le damos el valor: INADDR_ANY (cualquier IP).
- 
 
-
+*** Funciones para trabajar con IPV4:
+    - *inet_addr()*: Convierte una direccion IP que esta en una cadena de caracteres a un
+      entero de 32 bits en formato *big-endian*.
+    #+BEGIN_SRC C
+    uint32_t dir = inet_addr("192.168.1.1"); /* Introducimos la IP como cadena de chars */
+    struct sockaddr_in destino; /* Declaramos una direccion donde guardarla */
+    memcpy(&destino.sin_addr, &dir, 4); /* Copiamos la IP ya transformada a la variable de direccion */
+    #+END_SRC
+    - *inet_ntoa()*: convierte una direccion IP en formato entero de 32 bits a cadena de chars.
+      (lo contrario a inet_addr()).
+    #+BEGIN_SRC C
+    printf("Direccion IP: %s\n", inet_ntoa(destino.sin_addr));
+    #+END_SRC
+*** Funciones de socket():
+   #+BEGIN_SRC C 
+   int socket(int familia, int tipo, int protocolo);
+   #+END_SRC
+   - *int familia*: Familia del protocolo. Para TCP/IP: *PF_INET*.
+   - *int tipo*: 
+     - Orientado a la conexion (TCP): SOCK_STREAM;
+     - No orientado a la conexion (UDP): SOCK_DGRAM;
+   - *int protocolo*: Lo pondremos a 0, ya que nos asigna por defecto
+     el protocolo TCP para SOCK_STREAM y el protocolo UDP para SOCK_DGRAM.
+   - *return*: Nos devuelve el descriptor del socket abierto, si este fue
+     exitoso. Si hubo error devolvera -1.
+   #+BEGIN_SRC C
+   /* Abrir un socket para usar UDP */
+   int sd = socket(PF_INET, SOCK_DGRAM, 0); /* En sd tenemos el descriptor del socket */
+   /* Abrir un scoket para usar TCP */
+   int sd = socket(PF_INET, SOCK_STREAM, 0);
+   #+END_SRC
+*** Funciones de bind():
+   #+BEGIN_SRC C 
+   int bind(int sd, sockaddr *dir, socklen_t longitud);
+   #+END_SRC
+   Se utiliza para  vincular un puerto con la aplicacion, asi el nivel de transporte
+   sabra llegar al proceso a traves de dicho puerto.
+   - *int sd*: Descriptor que abrimos anteriormente con socket().
+   - *sockaddr \*dir*: Puntero al struct sockaddr que contiene el puerto.
+   - *socklen_t longitud*: Tamanyo del struct de direccion.
+   #+BEGIN_SRC C  
+   /* Declaramos la estructura para la direccion */
+   sockaddr_in dir_puerto; 
+   /* Inicializamos la estructura */
+   memset(&dir_puerto, 0, sizeof(dir_puerto));
+   /* Asignamos la familia */
+   dir_puerto.sin_family = AF_INET;
+   /* Asignamos el puerto */
+   dir_puerto.sin_port = htons(80); /* El puerto necesita ser transformado a big endian */
+   /* Asignamos la IP */
+   uint8_t dir[4] = { 192, 168, 1, 1}; /* 4 x 8 bytes = 32 bytes */
+   memcpy(&dir_puerto.sin_addr, dir, 4);
+   /* Abrimos un socket */
+   int sd = socket(PF_INET, SOCK_DGRAM, 0);
+   /* Vinculamos el puerto con el proceso */
+   int result = bind(sd,(struct sockaddr*) &dir_puerto, sizeof(dir_puerto));
+   #+END_SRC
