@@ -216,3 +216,116 @@
    /* Vinculamos el puerto con el proceso */
    int result = bind(sd,(struct sockaddr*) &dir_puerto, sizeof(dir_puerto));
    #+END_SRC
+** Sockets UDP:
+*** Envio de datos con UDP: 
+   #+BEGIN_SRC C
+   int sendto(int sd, char *datos, size_t longitud, int opciones, struct sockaddr *dir_destino, socklen_t longitud dir);
+   #+END_SRC
+   - *int sd*: Descriptor de socket.
+   - *char *datos*: Puntero a los datos a enviar.
+   - *size_t longitud*: Longitud de los datos a enviar. 
+   - *int opciones*: Opciones de envio (normalmente a 0)
+   - *struct sockaddr * dir_destino*: Puntero a la direccion de destino.
+   - *socklen_t longitud_dir*: Tamanyo de la direccion.
+   - *return*: Devuelve el tamanyo de los datos enviados o -1 si hay error.
+   
+   *Ejemplo:*
+   #+BEGIN_SRC C 
+   char datos[512] = "Hola";
+   sockaddr_in dir_destino;
+   /* Rellenamos la estructura */
+   /****************************/
+   /* Enviamos los datos       */
+   int bytesEnviados = sendto(sd, datos, strlen(datos), 0, (struct sockaddr *) &dir_destino, sizeof(dir_destino));
+   #+END_SRC
+*** Recepcion de datos con UDP:
+   #+BEGIN_SRC C 
+   int recvfrom(int sd, char * datos, size_t longitud, int opciones, struct sockaddr *dir_origen, socklen_t *longitud_dir);
+   #+END_SRC
+   - *int sd*: Descriptor de socket.
+   - *char *datos*: Puntero a la direccion donde recibir los datos.
+   - *size_t longitud*: Longitud maxima de datos a recibir. 
+   - *int opciones*: Opciones de recepcion (normalmente a 0)
+   - *struct sockaddr * dir_destino*: Puntero a la direccion de destino.
+   - *socklen_t *longitud_dir*: _Direccion de memoria_ con el tamanyo de la direccion.
+   - *return*: Devuelve el tamanyo de los datos recibidos o -1 si hay error.
+   
+   *Ejemplo*
+  #+BEGIN_SRC C 
+  char datos[512];
+  sockaddr_in dir_origen;
+  socklen_t longitud_direccion = sizeof(dir_origen);
+  int bytesRecibidos = recvfrom(sd, datos, 512, 0, (struct sockaddr *) &dir_origen, &longitud_direccion);
+  #+END_SRC
+*** Cierre de Socket:
+   #+BEGIN_SRC C 
+   int close(int sd);
+   #+END_SRC
+   Libera los recursos asociados al socket.
+   Al cerrar, ya no se pueden volver a realizar envios o recepciones. sendto() y recvfrom()
+   devuelven -1.
+** Ejemplos:
+*** UDP Receptor:
+  #+BEGIN_SRC C 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#define PUERTO 4950 /* Puerto para el bind */
+#define TBUFFER 100 /* Max tamanyo del buffer */
+
+int main(){
+
+  /* Declaramos las variables que vamos a necesitar */
+  int descriptorSocket;
+  struct sockaddr_in direccionReceptor;
+  struct sockaddr_in direccionEmisor;
+  socklen_t longitudDireccion;
+  int numBytes; /* Numero de bytes leidos */
+  char buffer[TBUFFER]; /* Buffer en el que recibir datos */
+
+  /* Creacion del socket UDP */
+  if((descriptorSocket = socket(PF_INET, SOCK_DGRAM, 0)) < 0){
+    perror("Error en la creacion del socket");
+    exit(-1);
+  }
+  /* Asignamos valores a la direccion del receptor */
+  memset(&direccionReceptor, 0, sizeof(direccionReceptor));
+  direccionReceptor.sin_family = AF_INET;
+  direccionReceptor.sin_port = htons(PUERTO);
+  direccionReceptor.sin_addr.s_addr = INADDR_ANY; /* Escucha por cualquier
+                                                    tarjeta con una IP asignada */
+  /* Hacemos el bind */
+  if(bind(descriptorSocket, (struct sockaddr *)direccionReceptor, sizeof(direccionReceptor)) < 0){
+    perror("Error al hacer bind()");
+    exit(-1);
+  }
+  /* Sacamos la longitud de la direccion del emisor y recibimos datos de este */
+  longitudDireccion = sizeof(direccionEmisor);
+  if((numeroDeBytes = recvfrom(descriptorSocket, buffer, TBUFFER, 0,
+                               (struct sockaddr *)&direccionEmisor,
+                               (socklen_t *) &longitudDireccion)) < 0){
+    perror("Error al recibir datos.");
+    exit(-1);
+  }
+
+  /* Ya hemos recibido los datos, por lo que vamos a imprimirlos por pantalla */
+  printf("Paquete recibido de %s\n", inet_ntoa(direccionEmisor.sin_addr)); /* Usamos inet_ntoa() para
+                                                                              pasar de uint32_t a cadena
+                                                                              de chars */
+  printf("El paquete tiene %d bytes de longitud\n", numeroDeBytes);
+  /* Le ponemos el \0 al buffer */
+  buffer[numeroDeBytes] = '\0';
+  printf("El paquete contiene esta cadena: %s\n", buffer);
+
+  /* Cerramos el Socket */
+  close(descriptorSocket);
+  return 0;
+}
+  #+END_SRC
