@@ -114,7 +114,8 @@
       /version 4 y un puerto/
     
     Las funciones del socket aceptan el tipo generico sockaddr. Por comodidad utilizaremos
-    *sockaddr_in*, ya que viene con los campos listos para escribir direcciones IPv4 y puerto.
+    *sockaddr_in*, ya que                                                              │  Essentially Emacs WIKI packages are concerned. They have been imported as local   │
+                                 viene con los campos listos para escribir direcciones IPv4 y puerto.
 
    #+BEGIN_SRC C
    struct in_addr {
@@ -264,8 +265,8 @@
    Libera los recursos asociados al socket.
    Al cerrar, ya no se pueden volver a realizar envios o recepciones. sendto() y recvfrom()
    devuelven -1.
-** Ejemplos:
-*** UDP Receptor:
+*** Ejemplos:
+**** UDP Receptor:
   #+BEGIN_SRC C 
 #include <stdio.h>
 #include <stdlib.h>
@@ -329,7 +330,7 @@ int main(){
   return 0;
 }
   #+END_SRC
-*** UDP Emisor:
+**** UDP Emisor:
    #+BEGIN_SRC C 
 #include <stdio.h>
 #include <stdlib.h>
@@ -393,3 +394,80 @@ int main(int argc, char *argv[]){
   return 0;
 }
    #+END_SRC
+
+** Sockets TCP:
+*** Funciones para trabajar con TCP:
+**** Funcion listen():
+   #+BEGIN_SRC C 
+   int listen(int sd, int longitud_cola_conexiones);
+   #+END_SRC
+   - Pone el socket con el descriptor sd en *modo servidor*, es decir,
+     esta preparado para *esperar conexiones* de clientes.
+   - *int longitud_cola_conexiones*: Maximo numero de clientes que pueden
+     estar esperando a ser atendidos. Si la cola esta llena y un cliente
+     intenta conectarse la conexion se rechaza.
+   - *return*: Devuelve 0 si hay exito, -1 para error.
+**** Funcion accept():
+      #+BEGIN_SRC C 
+      int accept(int sd, struct sockaddr *directionCliente, socklen_t *longitudDireccionCliente);
+      #+END_SRC
+   - Funcion que acepta una conexion de un cliente.
+   - *return*: Devuelve un descriptor de socket *nuevo*, que tiene las mismas
+     propiedades que *int sd*.
+     - Este nuevo descriptor identifica la conexion con el cliente, y sobre 
+       este utilizaremos las funciones para enviar y recibir datos.
+     - El *descriptor original* (int sd), *no puede utilizarse* para escribir o leer,
+       solo vale para aceptar nuevas conexiones de clientes.
+**** Funcion connect():
+    #+BEGIN_SRC C 
+    int connect(int sd, struct sockaddr *dir_destino, socklen_t longitud_dir);
+    #+END_SRC
+    Funcion que utiliza un cliente para establecer una conexion TCP con un servidor,
+    el cual se identifica por su IP y su puerto.\
+    - *return*: 0 para exito, -1 para error.
+**** Funciones para enviar datos:
+    #+BEGIN_SRC C 
+    int send(int sd, char *datos, size_t longitud_datos, int opciones_envio);
+
+    int write(int sd, char *datos, size_t longitud_datos);
+    #+END_SRC
+    Para enviar datos por *TCP* podemos utilizar tanto write(), que es propio
+    del SO, o send(), que permite opciones adicionales en el envio (ultimo argumento).
+    
+    - *int sd*: Descriptor de un socket que ya ha sido conectado.
+    - *char *datos*: Direccion de memoria de los datos a escribir.
+    - *size_t longitud_datos*: Longitud de los datos a enviar.
+    - *int opciones_envio*: Puede ser urgente, sin bloqueo... Consultar send() en el 
+      manual. Para *envios normales* lo pondremos a *0*.
+    - *return*: Devuelve el numero de bytes enviados por TCP o -1 para error.
+      - *Atencion*: Esto no quiere decir que se hayan entregado. El sistema puede mantener
+        los datos en un buffer hasta que se puedan entregar.
+      - Si el return no coincide con longitud_datos hay que intentar reenviar los datos que
+        faltan.
+      - *IMPORTANTE*: Si intentamos escribir por un socket cerrado, el SO puede mandarnos
+        un signal que nos cierre el programa (concretamente SIGPIPE). Para evitar esto
+        podemos usar un ignore: signal(SIGPIPE, SIG_IGN);
+**** Funciones para recibir datos:
+   #+BEGIN_SRC C 
+   int recv(int sd, char * datos, size_t longitud_datos, int opciones_recepcion);
+
+   int read(int sd, char *datos, size_t longitud_datos);
+   #+END_SRC
+   Ambas funciones nos permiten recibir datos a traves de una conexion TCP.
+   - *int sd*: Descriptor de un socket que ya ha sido conectado.
+   - *char *datos*: Direccion de memoria donde vamos a guardar los datos
+     recibidos.
+   - *size_t longitud_datos*: Numero *maximo* de bytes que se van a almacenar
+     en memoria.
+   - *int opciones_envio*: Diversas opciones. Consultar flags en la entrada del
+     man de recv(). Para modo normal lo ponemos a 0.
+   - *return*: Existen tres posibilidades:
+     - Que nos devuelva el numero de bytes leidos (<= longitud_datos).
+     - Que nos devuelva 0 si se ha cerrado la conexion por el otro
+       extremo.
+     - -1 si hay error.
+**** Funcion close():
+    #+BEGIN_SRC C 
+    int close(int sd);
+    #+END_SRC
+    Cierra el socket y libera los recursos asociados al mismo.
