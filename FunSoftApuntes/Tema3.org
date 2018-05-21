@@ -114,8 +114,7 @@
       /version 4 y un puerto/
     
     Las funciones del socket aceptan el tipo generico sockaddr. Por comodidad utilizaremos
-    *sockaddr_in*, ya que                                                              │  Essentially Emacs WIKI packages are concerned. They have been imported as local   │
-                                 viene con los campos listos para escribir direcciones IPv4 y puerto.
+    *sockaddr_in*, ya que viene con los campos listos para escribir direcciones IPv4 y puerto.
 
    #+BEGIN_SRC C
    struct in_addr {
