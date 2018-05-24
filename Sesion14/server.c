@@ -62,10 +62,11 @@ int main(){
   /* Ponemos el \0 */
   buffer[numBytes] = '\0';
   
-  while((strcmp(buffer, "fin")) != 0){
+  while((strcmp(buffer, "stop")) != 0){
     printf("He recibido algo: \n");
     printf("El paquete tiene un tamanyo: %zu\n", strlen(buffer));
     printf("Su contenido es: %s\n", buffer);
+    printf("Fue enviado por: %s\n", inet_ntoa(dirCliente.sin_addr));
 
     if((numBytes = recvfrom(descSocket, buffer, TBUFFER, 0,
                             (struct sockaddr *) &dirCliente,
