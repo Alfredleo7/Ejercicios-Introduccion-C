@@ -1,0 +1,174 @@
+* Tema 4: Comunicaciones en Internet
+** *Protocolo IP*
+   En el nivel de red, TCP/IP ofrece el protocolo entre redes IP. Este, a su 
+   vez contiene cuatro protocolos:
+   - ARP
+   - RARP
+   - ICMP
+   - IGMP
+   
+   IP es el mecanismo de transmision utilizado por los protocolos TCP/IP. Se 
+   basa en paquetes denominados *datagramas* y es *no fiable* (no ofrece comprobaciones 
+   ni seguimientos).
+   Posibles errores en la transmision:
+   - Ruptura fisica de la red
+   - Error en bits por el ruido
+   - Un router esta saturado, por lo que no le da tiempo a enviar un datagrama antes
+     de que se supere su limite de tiempo
+   - Que los datagramas entren en bucle
+   
+   Para garantizar una fiabilidad, IP debe ser utilizado con el protocolo *TCP/IP*.
+   IP transporta los datos en datagramas, cada uno de los cuales se transporta de manera
+   *independiente*. Por lo tanto pueden llegar duplicados o desordenados. El receptor
+   debe encargarse de solucionar estos inconvenientes.
+** *Direcciones IPv4*
+   Una direccion IPv4 tiene *32 bits*. Define _unica y exclusivamente_ la conexion de un 
+   dispositivo a Internet (como un ordenador o un router). 
+   
+   Las direcciones IPv4 son unicas, dos dispositivos conectados a Internet no pueden tener
+   la misma direccion. Es posible, sin embargo, asignar estar direcciones temporalmente y
+   reasignarlas tras este periodo de tiempo.
+   Si un dispositivo tiene *N* conexiones a Internet, debe tener *N* direcciones.
+
+*** *Formas de representacion - Notacion*:
+**** *Notacion binaria*:
+     Se muestran 4 octetos, cada uno denominado como un byte. 
+
+     ~01110101 10010101 00011101 00000010~
+
+**** *Notacion punto-decimal*: 
+     Es la notacion a la que estamos mas acostumbrados. Representa cada octeto
+     decimalmente y separados por un punto. La direccion anterior en esta\
+     notacion seria:
+
+     ~179.149.29.2~
+
+**** *Espacio de direcciones*:
+    Un espacio de direcciones es el numero de direcciones utilizadas por el protocolo.
+    Si un protocolo utiliza *N* bits para definir una direccion, el especio de direcciones
+    es 2^N, ya que cada bit puede ser 0 o 1.
+
+    IPv4 utiliza 32 bits, por lo que el numero de direcciones disponibles es 2^32. Esto supone
+    unas 4000 millones de direcciones, aunque esto es solo teorico. Como veremos, el numero real
+    es bastante inferior debido a las restricciones impuestas.
+
+
+***** *Identificacion de errores*:
+      Es sencillo identificar errores en este tipo de direcciones siguiendo las
+      siguientes pautas:
+      
+      - Una direccion IPv4 no puede representarse con mas de 4 numeros
+        - ~111.34.28.2.3~ seria erroneo
+      - No puede haber un cero delante de un octeto
+        - ~112.89.045.3~ seria tambien erroneo
+      - Todos los numeros deben ser menores de 255 (maximo para 8 bits)
+        - ~192.168.301.7~ erronea
+*** *Direccionamiento con clases*:     
+     El concepto de clases es utilizado por IPv4. Este esquema se esta quedando
+     obsoleto, ya que se desperdician multitud de direcciones.
+     
+     | Clase | Rango teorico de direcciones    | Uso                 |
+     |-------+---------------------------------+---------------------|
+     | A     | 0.0.0.0 hasta 127.255.255.255   | Redes muy grandes   |
+     | B     | 128.0.0.0 hasta 191.255.255.255 | Redes de tam. medio |
+     | C     | 192.0.0.0 hasta 224.255.255.255 | Redes pequenyas     |
+     | D     | 225.0.0.0 hasta 239.255.255.255 | Multicast           |
+     | E     | 240.0.0.0 hasta 247.255.255.255 | Experimental        |
+     
+     Vemos que el primer inconveniente que se plantea es que solo hay *128* bloques
+     con direcciones *clase A*, aunque el tamanyo de estos sea de *16.777.216* direcciones.
+     Son demasiado grandes para una organizacion, por lo que normalmente muchas direcciones
+     acaban siendo desperdiciadas.
+     Estas normalmente son utilizadas por multinacionales como Apple, IBM, MIT...
+     
+     La *clase B* nos ofrece *16.384* *bloques* con *65.536* *direcciones.* Esto sigue siendo
+     enorme para una organizacion media.
+     Estas suelen ser usadas por empresas como Microsoft o la Universidad de Glasgow.
+
+     La *clase C* nos ofrece *2.097.152* *bloques*,  pero solo *256* *direcciones* para cada uno de
+     ellos. Esto es demasiado poco para muchas organizaciones.
+     
+     La *clase D* fue definida para Multienvio. Cada direccion se usa para definir un grupo
+     de dispositivos en Internet. Se predijo que el numero de grupos seria de 268.435.456,
+     pero esto no ocurrio. Como resultado, aqui tambien se malgastaron un monton de direcciones.
+
+     La *clase E* fue reservada para futuras tecnologias y como experimental. Solo se usaron
+     unas pocas, por lo que el resto fue tambien desperdiciado.
+***** *Notacion binaria*
+      | Clase | Primer Byte |
+      |-------+-------------|
+      | A     |    0XXXXXXX |
+      | B     |    10XXXXXX |
+      | C     |    110XXXXX |
+      | D     |    1110XXXX |
+      | E     |    1111XXXX |
+***** *Notacion punto-decimal*
+      | Clase | Primer Byte |
+      |-------+-------------|
+      | A     | 0 - 127     |
+      | B     | 128 - 191   |
+      | C     | 192 - 223   |
+      | D     | 224 - 239   |
+      | E     | 240 - 255   |
+*** *Direccionamiento sin clases*
+    
+** Arquitectura del protocolo TCP/IP
+   Se compone de varias capas:
+   - *Capa de aplicacion*:
+     - Proporciona servicios de proposito general, tales como la
+       transferencia de ficheros, correo electronico, etc...
+   - *Capa de transporte* (Nivel 4):
+     - Proporciona un servicio de transferencia de datos extremo a extremo
+       entre procesos
+   - *Capa de Internet* (Nivel 3):
+     - Relacionada con el encaminamiento de datos del nodo origen al destino a
+       traves de una o mas redes conectadas por dispositivos de encaminamiento
+       (routers IP).
+   - *Capa de acceso a red* (Niveles 1 y 2):
+     - Relacionada con la interfaz logica entre un sistema final y una subred.
+       la parte de capa fisica define las caracteristicas del medio de transmision,
+       el esquema de codificacion de las senyales... 
+
+** Relacion de ejercicios:
+*** Ejercicio 1:
+    Explique por que l amayoria de las direcciones de clase A se malgastan.
+    Explique por que una organizacion de tamanyo medio o grande no quiere un
+    bloque de direcciones de clase C.
+
+    Muchas direcciones de la clase A se malgastan ya que hay pocas organizaciones
+    que consigan tener el numero de equipos necesarios para utilizar todas (16.777.216
+    equipos).
+
+*** Ejercicio 2:
+    Que es una mascara de direccionamiento IP? Que es una mascara por defecto
+    en direccionamiento IP?
+    
+    Una mascara de red es una secuencia de 32 bits que sirve para determinar el numero
+    de bits de una direccion IP que corresponden a la red. Empiezan con un numero
+    consecutivo de 1s y el resto 0s.
+    En IPv4 tenemos 3 mascaras por defecto:
+    - Clase A: 255.255.255.0
+    - Clase B: 255.255.0.0
+    - Clase C: 255.255.255.0
+
+*** Ejercicio 3:
+    Cual es la direccion de red (netid) de un bloque de direcciones? Como podemos
+    encontrar la direccion de red si nos dan una direccion IP perteneciente a un
+    bloque?
+
+    Las direcciones de red de un bloque dependen del prefijo de la direccion IP (clases).
+    Por tanto, basta con mirar los primeros bits de la direccion IP para determinar el
+    netid.
+    Ejemplo con la clase B (16.384 bloques):
+    |         | Netid 128.0               | Netid 128.1               | ... | Netid 191.255                 |
+    |---------+---------------------------+---------------------------+-----+-------------------------------|
+    | Clase B | 128.0.0.0 a 128.0.255.255 | 128.1.0.0 a 128.1.255.255 | ... | 191.255.0.0 a 192.255.255.255 |
+    |---------+---------------------------+---------------------------+-----+-------------------------------|
+    |         | Bloque 1                  | Bloque 2                  | ... | Bloque 16.384              |
+*** Ejercicio 4:
+    Cual es la diferencia entre la entrega de una trama en el nivel de enlace de
+    datos y la entrega de un paquete a nivel de red?
+
+    La entrega a nivel de enlace se hace extremo a extremo entre dos equipos dentro
+    de una misma red local. La entrega a nivel de red se hace extremo a extremo entre
+    dos equipos, independientemente de la red a la que estos pertenezcan.
