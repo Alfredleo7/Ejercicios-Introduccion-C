@@ -38,7 +38,7 @@
 
 **** *Notacion punto-decimal*: 
      Es la notacion a la que estamos mas acostumbrados. Representa cada octeto
-     decimalmente y separados por un punto. La direccion anterior en esta\
+     decimalmente y separados por un punto. La direccion anterior en esta 
      notacion seria:
 
      ~179.149.29.2~
@@ -94,7 +94,9 @@
 
      La *clase E* fue reservada para futuras tecnologias y como experimental. Solo se usaron
      unas pocas, por lo que el resto fue tambien desperdiciado.
-***** *Notacion binaria*
+     
+     *Notacion binaria*
+      
       | Clase | Primer Byte |
       |-------+-------------|
       | A     |    0XXXXXXX |
@@ -102,7 +104,9 @@
       | C     |    110XXXXX |
       | D     |    1110XXXX |
       | E     |    1111XXXX |
-***** *Notacion punto-decimal*
+      
+      *Notacion punto-decimal*
+
       | Clase | Primer Byte |
       |-------+-------------|
       | A     | 0 - 127     |
@@ -110,8 +114,103 @@
       | C     | 192 - 223   |
       | D     | 224 - 239   |
       | E     | 240 - 255   |
+
+      *Netid y hostid*
+
+      En el direccionamiento con clases, las direcciones de clase A, B o C se dividen
+      en *hostid* y *netid*. Estas son de longitud variable, dependiendo de la clase.
+      A continuacion se ven los bytes utilizados por cada clase:
+
+      | Clase | Binario                             | Punto-Decimal | CIDR |
+      |-------+-------------------------------------+---------------+------|
+      | A     | 11111111 00000000 00000000 00000000 |     255.0.0.0 | /8   |
+      | B     | 11111111 11111111 00000000 00000000 |   255.255.0.0 | /16  |
+      | C     | 11111111 11111111 11111111 00000000 |  255.255.25.0 | /24  |
+
+**** *Subnetting y Supernetting*
+***** *Subnetting*
+      Durante la era del direccionamiento con clases, si una organizacion recibia un bloque
+      de clase A o B, podia dividir este en subredes mas pequenyas. Esto aumenta el numero
+      de 1s en la mascara.
+***** *Supernetting*
+      Si por el contrario una organizacion recibia un bloque de tipo C, el cual era demasiado
+      pequenyo para la mayoria de ellas, podia combinar varios bloques de tipo C para cubrir
+      sus necesidades. Esto reduce el numero de 1s en la mascara.
 *** *Direccionamiento sin clases*
-    
+    Dado el agotamiento de las direcciones IPv4 y la necesidad de seguir dando acceso
+    a Internet a nuevas organizaciones, se creo el direccionamiento sin clases. Aunque
+    con este esquema no hay clases, las direcciones aun se asignan por bloques.
+
+**** *Bloques de direcciones*
+     Cuando una entidad necesita acceso a Internet, recibe un bloque (rango) de direcciones
+     que varia dependiendo de la naturaleza y los fines de la entidad. Un ISP puede
+     recibir cientos de miles de direcciones, mientras que un pequenyo negocio puede
+     recibir 10, por ejemplo.
+
+     Para facilitar la gestion, se impusieron tres reglas basicas:
+     - Las direcciones dentro de un bloque deben ser contiguas.
+     - El numero de direcciones en un bloque debe ser potencia de dos (2, 4, 8, 16...)
+     - La primera direccion debe ser divisible por el numero de direcciones.
+**** *Mascaras sin clases:*
+      Como vimos anteriormente, *una mascara es un numero de 32 bits que comienza con*
+      *una sucesion de 1s seguido de 0s*. Pero cada clase tenia su mascara predeterminada.
+      
+      En el direccionamiento sin clases, la mascara es representada por *N* 1s seguido
+      de 32-*N* 0s, pudiendo *N* ser cualquier numero entre 0 y 32. Es por esto que es
+      conveniente utilizar la notacion de barra (CIDR).
+      
+      *En direccionamiento IPv4 podemos definir un bloque de direcciones como x.y.z.t/n*
+      *donde x.y.z.t define una de las direcciones y /n define la mascara. La direccion*
+      *y la notacion /n definen completamente el bloque: primera direccion, ultima y*
+      *numero total de direcciones en el bloque*
+
+***** *Ejemplo mascaras sin clases*
+       Una pequenya organizacion recibe un bloque de direcciones. Se sabe que una de las
+       direcciones es ~205.16.37.39/28~. Cual es la primera direccion del bloque?
+
+       *Solucion*
+
+       La direccion dada representada en binario es: ~11001101 00010000 00100101 00100111~.
+       La mascara nos dice que si ponemos los 32-*N*, siendo *N* = 28, bits a 0 obtendremos
+       la *primera direccion*. Por lo tanto esta es: ~11001101 00010000 00100101 00100000~\
+       o tambien ~205.16.37.32~.
+
+
+       La *ultima direccion* se puede obtener poniendo estos bits a 1: 
+       ~11001101 00010000 00100101 00101111~ o ~205.15.32.47~.
+
+       El *numero de direcciones* tambien es facil de obtener. Dado que *N* = 28, el numero
+       de direcciones es 2^(32-28) = 16.
+**** *Direcciones de red:*
+     Cunado se da a una organizacion un bloque de direcciones, esta es libre de repartirlas
+     a los dispositivos que necesite conectar a Internet. Normalmente (aunque no en todos los
+     casos), *la primera direccion se denomina direccion de red y define la red de la organizacion.*
+     
+     Es decir, la primera direccion no se asigna a un dispositivo: sirve como direccion que
+     representa a la organizacion ante el resto del mundo.
+**** *Jerarquia en el direccionamiento con clases:*
+     Una organizacion puede querer dividir su bloque de direcciones en subredes. Estas
+     no son visibles para el resto del mundo, que sigue viendo a la organizacion como 
+     una sola entidad. La informacion se envia a la direccion del router de la organizacion,
+     que despues se encarga de repartirla entre sus subredes.
+
+     *Ejemplo*
+     Tenemos una empresa con el bloque 17.12.40.0/26, que contiene 64 direcciones. La empresa
+     quiere dividir este en 3 subredes de 32, 16 y 16 direcciones. Las nuevas mascaras se
+     pueden hallar como:
+     - Siendo n1 la mascara de la primera subred, 2^(32-n1) debe ser igual a 32, por lo que n1
+       vale 27.
+     - Siendo n2 la mascara de la segunda subred, 2^(32-n2) debe ser igual a 16, por lo que n2
+       vale 28.
+     - Siendo n3 la mascara de la tercera subred, 2^(32-n3) debe ser igual a 16, por lo que n3
+       vale 28 tambien.
+       
+     Esto significa que tenemos como mascara de la organizacion 26, y como submascaras 27, 28 y 28.
+     A partir de esto podemos encontrar todas las direcciones de cada subred, tal y como
+     se explica en un ejemplo anterior.
+     
+     
+
 ** Arquitectura del protocolo TCP/IP
    Se compone de varias capas:
    - *Capa de aplicacion*:
@@ -131,7 +230,7 @@
 
 ** Relacion de ejercicios:
 *** Ejercicio 1:
-    Explique por que l amayoria de las direcciones de clase A se malgastan.
+    Explique por que la mayoria de las direcciones de clase A se malgastan.
     Explique por que una organizacion de tamanyo medio o grande no quiere un
     bloque de direcciones de clase C.
 
@@ -172,3 +271,52 @@
     La entrega a nivel de enlace se hace extremo a extremo entre dos equipos dentro
     de una misma red local. La entrega a nivel de red se hace extremo a extremo entre
     dos equipos, independientemente de la red a la que estos pertenezcan.
+*** Ejercicio 5:    
+    Cual es la diferencia entre un servicio orientado a la conexion y no orientado a la conexion?
+    
+    En un servicio orientado a la conexion garantizamos la entrega de los paquetes,
+    mientras que en uno no orientado a conexion no podemos asegurar que estos lleguen
+    ni el orden en el que lo hagan.
+*** Ejercicio 6:
+    Defina el concepto de fragmentacion y explique por que los protocolos IP necesitan 
+    fragmentar algunos paquetes.
+
+    La fragmentacion es el proceso por el cual un datagrama se divide en tramas de menor
+    tamanyo para ajustarse a las limitaciones maximas establecidas por el nivel de enlace
+    subyacente.
+*** Ejercicio 7:
+    Explique la necesidad de opciones en IP e indique las opciones mencionadas en clase
+    con una breve descripcion de cada una de ellas:
+
+    El campo Opciones sirve para incluir informacion no especificada en el disenyo original
+    de IP. Las que hemos definido en clase son:
+    - Fiabilidad: Especifica como de fiable es el datagrama
+    - Encaminamiento por la fuente: Lista secuencial de direcciones de dispositivo. Indica
+      el camino completo a seguir.
+    - Encaminamiento libre desde origen: Lista de encaminadores que no deben evitarse.
+    - Registro de la ruta: Se reserva un campo para registrar la secuencia de dispositivos
+      de encaminamiento.
+    - Marcas de tiempo: Los dispositivios de encaminamiento incorporan una marca temporal
+      y su direccion.
+
+*** Ejercicio 8:
+    Cual es la direccion broadcast para Ethernet?
+
+    La direccion broadcast para Ethernet es con los 48 bits a 1: ~FF.FF.FF.FF.FF.FF~.
+*** Ejercicio 9:
+    Cual es el objetivo de incluir la cabecera IP y los 8 primeros bytes de datos del datagrama
+    en los mensajes de error de ICMP?
+    
+    El objetivo de incluir esta informacion en los mensajes de error es que el origen sea
+    capaz de identificar que mensaje origino el error.
+*** Ejercicio 10:
+    Como se puede determinar si un paquete IP transporta un paqeuete ICMP?
+    
+    Comprobando el campo Protocolo de la cabecera IP se puede comprobar el protocolo de
+    nivel superior transportado.
+*** Ejercicio 11:
+    En casos donde la fiabilidad no es de importancia primaria, UDP seria un buen
+    protocolo de transporte. De ejemplo de estos casos:
+
+    Configuracion de equipos (DHCP), streaming multimedia (audio o video),
+    resolucion de nombres (DNS), servicio de email...
