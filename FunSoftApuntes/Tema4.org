@@ -20,7 +20,7 @@
    Para garantizar una fiabilidad, IP debe ser utilizado con el protocolo *TCP/IP*.
    IP transporta los datos en datagramas, cada uno de los cuales se transporta de manera
    *independiente*. Por lo tanto pueden llegar duplicados o desordenados. El receptor
-   debe encargarse de solucionar estos inconvenientes.
+   debe encargarse de solucionar estos inconveniente
 ** *Direcciones IPv4*
    Una direccion IPv4 tiene *32 bits*. Define _unica y exclusivamente_ la conexion de un 
    dispositivo a Internet (como un ordenador o un router). 
@@ -209,8 +209,6 @@
      A partir de esto podemos encontrar todas las direcciones de cada subred, tal y como
      se explica en un ejemplo anterior.
      
-     
-
 ** Arquitectura del protocolo TCP/IP
    Se compone de varias capas:
    - *Capa de aplicacion*:
@@ -246,7 +244,7 @@
     de bits de una direccion IP que corresponden a la red. Empiezan con un numero
     consecutivo de 1s y el resto 0s.
     En IPv4 tenemos 3 mascaras por defecto:
-    - Clase A: 255.255.255.0
+    - Clase A: 255.0.0.0
     - Clase B: 255.255.0.0
     - Clase C: 255.255.255.0
 
@@ -271,7 +269,7 @@
     La entrega a nivel de enlace se hace extremo a extremo entre dos equipos dentro
     de una misma red local. La entrega a nivel de red se hace extremo a extremo entre
     dos equipos, independientemente de la red a la que estos pertenezcan.
-*** Ejercicio 5:    
+*** Ejercicio 5:
     Cual es la diferencia entre un servicio orientado a la conexion y no orientado a la conexion?
     
     En un servicio orientado a la conexion garantizamos la entrega de los paquetes,
@@ -310,7 +308,7 @@
     El objetivo de incluir esta informacion en los mensajes de error es que el origen sea
     capaz de identificar que mensaje origino el error.
 *** Ejercicio 10:
-    Como se puede determinar si un paquete IP transporta un paqeuete ICMP?
+    Como se puede determinar si un paquete IP transporta un paquete ICMP?
     
     Comprobando el campo Protocolo de la cabecera IP se puede comprobar el protocolo de
     nivel superior transportado.
@@ -320,3 +318,40 @@
 
     Configuracion de equipos (DHCP), streaming multimedia (audio o video),
     resolucion de nombres (DNS), servicio de email...
+*** Ejercicio 12:
+    Tienen UDP e IP el mismo grado de falta de fiabilidad? Por que?
+
+    Ambos protocolos son poco fiables, ya que ninguno incorpora un mecanismo
+    que te permita saber si los paquetes se han entregado con exito y si estos
+    han llegado de manera ordenada.
+*** Ejercicio 13:
+    Tienen los numero de puerto que ser unicos? Por que o por que no? Por que
+    las direcciones de puerto son mas pequenyas que las direcciones IP?
+
+    Las direcciones de puerto son unicas dentro de cada maquina, ya que
+    identifican un proceso dentro de esta. Esto tambien explica por que son mas
+    cortas, ya que las direcciones IP sirven para identificar dispositivos conectados
+    a Internet y estos son mucho mas numerosos que los procesos en una maquina.
+*** TODO Ejercicio 14:
+    Cual es el tamany minimo de un datagrama UDP? Y el maximo?
+
+
+
+*** Ejercicio 19:
+    Cambie las siguientes direcciones IP de punto-decimal a binario:
+    
+    | Punto-decimal | Binario                             |
+    |---------------+-------------------------------------|
+    |    114.32.2.8 | 01110010 00100010 00000010 00001000 |
+    |    129.14.6.8 | 10000001 00001110 00000110 00001000 |
+    |  208.34.54.12 | 11010000 00100010 00110110 00001100 |
+    |    238.34.2.1 | 11101110 00100010 00000010 00000001 |
+*** Ejercicio 20:
+    Cambie las siguientes direcciones IP de binario a punto-decimal:
+    
+    |                             Binario |   Punto-decimal |
+    |-------------------------------------+-----------------|
+    | 01111111 11110000 01100111 01111101 | 127.240.103.125 |
+    | 10101111 11000000 11111000 00011101 |  175.192.248.29 |
+    | 11011111 10110000 00011111 01011101 |   223.176.31.93 |
+    | 11101111 11110111 11000111 00011101 |  239.247.199.29 |
