@@ -23,7 +23,6 @@ int main(){
   uint32_t longitudBE;
   struct sockaddr_in dirServer, dirClient;
   socklen_t addrLen = sizeof(dirClient);
-
   /* Creamos la direccion del servidor */
   memset(&dirServer, 0, sizeof(dirServer));
 
